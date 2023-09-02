@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://getbootstrap.com/docs/5.3/assets/css/docs.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css"
+      rel="stylesheet"
+    />
+
+    <title>Rent A Car</title>
+  </head>
+  <body>
+    <!-- Example Code -->
+
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %} {% for category, message in messages %}
+    <div
+      class="toast fade show position-absolute top-0 end-0 z-1 mt-5 me-3"
+      style="margin-top: 70px !important"
+      role="alert"
+      aria-live="assertive"
+      aria-atomic="true"
+      data-bs-autohide="false"
+    >
+      <div class="toast-body" style="background-color: black; color: #fff">
+        <strong>{{ message }}</strong>
+      </div>
+    </div>
+    {% endfor %} {% endif %} {% endwith %}
+
+    <nav class="navbar navbar-expand-lg bg-primary">
+      <div class="container-fluid">
+        <a class="navbar-brand text-light" href="#">Rent A Car</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link active text-light" aria-current="page" href="#"
+                >Home</a
+              >
+            </li>
+            <li class="nav-item">
+              <button
+                type="button"
+                class="btn btn-primary"
+                data-bs-toggle="modal"
+                data-bs-target="#exampleModal"
+                data-bs-whatever="@getbootstrap"
+              >
+                Dodaj vozilo
+              </button>
+
+              <div
+                class="modal fade"
+                id="exampleModal"
+                tabindex="-1"
+                aria-labelledby="exampleModalLabel"
+                aria-hidden="true"
+              >
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h1 class="modal-title fs-5" id="exampleModalLabel">
+                        Dodaj vozilo
+                      </h1>
+                      <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"
+                      ></button>
+                    </div>
+                    <div class="modal-body">
+                      <form method="POST" action="/dodaj-vozilo">
+                        <div class="mb-3">
+                          <label for="recipient-name" class="col-form-label"
+                            >Marka vozila:</label
+                          >
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="recipient-name"
+                            name="marka"
+                          />
+                        </div>
+                        <div class="mb-3">
+                          <label for="message-text" class="col-form-label"
+                            >Model vozila:</label
+                          >
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="recipient-name"
+                            name="model"
+                          />
+                        </div>
+                        <div class="form-group">
+                          <label for="godina">Godina vozila:</label>
+                          <input
+                            type="number"
+                            class="form-control"
+                            id="godina"
+                            name="godina"
+                            required
+                          />
+                        </div>
+                        <div class="form-group mt-3">
+                          <label for="registracijska"
+                            >Registracijska oznaka:</label
+                          >
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="registracijska"
+                            name="registracijska_oznaka"
+                            required
+                          />
+                        </div>
+                        <label for="cijena">Dostupnost</label>
+                        <select
+                          class="form-select mt-3"
+                          aria-label="Default select example"
+                          name="dostupno"
+                        >
+                          <option selected>Dostpuno</option>
+                          <option value="true">Da</option>
+                          <option value="false">Ne</option>
+                        </select>
+
+                        <div class="form-group mt-3">
+                          <label for="cijena">Cijena najma:</label>
+                          <input
+                            type="number"
+                            class="form-control"
+                            id="cijena"
+                            name="cijena_najma"
+                            required
+                          />
+                        </div>
+
+                        <button
+                          type="submit"
+                          class="btn btn-primary mt-3 w-100"
+                          id="addClassBtn"
+                        >
+                          Dodaj vozilo
+                        </button>
+                      </form>
+                    </div>
+                    <div class="modal-footer">
+                      <button
+                        type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal"
+                      >
+                        Close
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </li>
+          </ul>
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item dropdown"></li>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#">Odjava</a></li>
+            </ul>
+          </ul>
+
+          <div class="btn-group dropstart">
+            {% if 'user_name' in session %}
+            <button
+              type="button"
+              class="btn btn-primary dropdown-toggle"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              {{ session['user_name'] }}
+            </button>
+            {% endif %}
+
+            <ul class="dropdown-menu">
+              <li>
+                <a
+                  href="{{ url_for('logout') }}"
+                  class="nav-link active text-center"
+                  >Odjava</a
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <div class="table-responsive">
+      <table class="table table-primary table-striped table-hover mt-5">
+        <thead>
+          <tr>
+            <th scope="col">id</th>
+            <th scope="col">Marka</th>
+            <th scope="col">Model</th>
+            <th scope="col">Godina</th>
+            <th scope="col">Reg.oznaka</th>
+            <th scope="col">Dostupno</th>
+            <th scope="col">Cijena</th>
+            <th scope="col">Izbrisi proizvod</th>
+            <th scope="col">Uredi proizvod</th>
+            <th scope="col">Najam</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for voziloo in vozilo %}
+          <tr>
+            <th scope="row">{{voziloo.ID_vozila}}</th>
+            <td>{{ voziloo.marka }}</td>
+            <td>{{ voziloo.model }}</td>
+            <td>{{ voziloo.godina }}</td>
+            <td>{{ voziloo.registracijska_oznaka }}</td>
+            <td>
+              {% if voziloo.dostupno == "true" %}
+              <p class="text-success">Da</p>
+              {% else %}
+              <p class="text-danger">Ne</p>
+              {% endif %}
+            </td>
+            <td>{{ voziloo.cijena_najma }} €</td>
+            <td>
+              <form
+                action="{{ url_for('izbrisi_vozilo', ID_vozila=voziloo.ID_vozila) }}"
+                method="POST"
+              >
+                <input type="hidden" name="ID_proizvoda" />
+                <button type="submit" class="btn btn-danger btn-sm">
+                  Izbrisi
+                </button>
+              </form>
+            </td>
+            <td>
+              <form
+                action="{{ url_for('uredi_vozilo', ID_vozila=voziloo.ID_vozila) }}"
+              >
+                <input type="hidden" name="ID_food" />
+                <button type="submit" class="btn btn-warning btn-sm">
+                  Uredi
+                </button>
+              </form>
+            </td>
+            <td>
+              <form>
+                {% if voziloo.dostupno == "true" %}
+                <button
+                  type="button"
+                  class="btn btn-success btn-sm rent-btn"
+                  data-bs-toggle="modal"
+                  data-bs-target="#myModal1"
+                  data-vehicle-id="{{ voziloo.ID_vozila }}"
+                >
+                  Rent
+                </button>
+                {% else %}
+                <button type="submit" class="btn btn-success btn-sm" disabled>
+                  Rent
+                </button>
+                {% endif %}
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% for voziloo in vozilo %}
+    <div
+      class="modal fade"
+      id="myModal1"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="myModal1Label"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Odaberi datum</h5>
+            <button
+              type="button"
+              class="close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form action="/handle_najam" method="POST">
+              <input type="hidden" id="vozilo" name="id_vozila" />
+              <input type="hidden" id="selected-user-id" name="id_korisnika" />
+              <div class="form-group">
+                <label for="start-date">Start Date:</label>
+                <input
+                  type="date"
+                  class="form-control"
+                  id="start-date"
+                  name="start_date"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="end-date">End Date:</label>
+                <input
+                  type="date"
+                  class="form-control"
+                  id="end-date"
+                  name="end_date"
+                  required
+                />
+              </div>
+              <button type="submit" class="btn btn-primary w-100 mt-3">
+                Potvrdi najam
+              </button>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary w-100"
+              data-bs-dismiss="modal"
+            >
+              Zatvori
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %} {% if provjera > 0 %}
+    <h3 class="mt-5">Najam</h3>
+
+    <table class="table table-dark table-striped table-hover mt-5">
+      <thead>
+        <tr>
+          <th scope="col">Id_najma</th>
+          <th scope="col">Model automobila</th>
+          <th scope="col">Ime korisnika</th>
+          <th scope="col">Datum najma</th>
+          <th scope="col">Datum povrata</th>
+          <th scope="col">Izbrisi najam</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for najamm in najam %}
+        <tr>
+          <th scope="row">{{najamm.ID_najma}}</th>
+          <td>
+            {% for voziloo in vozilo %} {% if voziloo.ID_vozila ==
+            najamm.vozilo_id %} {{ voziloo.model }} {% endif %} {% endfor %}
+          </td>
+          <td>
+            {% for korisnikk in korisnik %} {% if korisnikk.ID_korisnika ==
+            najamm.korisnik_id %} {{ korisnikk.ime }} {% endif %} {% endfor %}
+          </td>
+          <td>{{ najamm.datum_najma.strftime('%d/%m/%Y') }}</td>
+          <td>{{ najamm.datum_povrata.strftime('%d/%m/%Y') }}</td>
+          <td>
+            <form
+              action="{{ url_for('izbrisi_najam', ID_najma=najamm.ID_najma) }}"
+              method="POST"
+            >
+              <button class="btn btn-danger btn-sm">Izbrisi</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% endif %}
+
+    <script>
+      var userID = "{{ session['user_id'] }}";
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"
+      integrity="sha512-3cMIfcSTv2RN7NS88RjVcZZVFrWWQOoXaQK98XMTPYwNddcIUGiqL2N1XxLj3j9qEzbeJqjywy87gkc60W7Qg=="
+      crossorigin="anonymous"
+    ></script>
+
+    <script>
+      function formatDate(date) {
+        const year = date.getFullYear();
+        let month = date.getMonth() + 1;
+        if (month < 10) {
+          month = "0" + month;
+        }
+        let day = date.getDate();
+        if (day < 10) {
+          day = "0" + day;
+        }
+        return year + "-" + month + "-" + day;
+      }
+
+      function setMinDateToday() {
+        const today = new Date();
+        const formattedToday = formatDate(today);
+        document
+          .getElementById("start-date")
+          .setAttribute("min", formattedToday);
+      }
+
+      function setMinEndDate() {
+        const startDateValue = document.getElementById("start-date").value;
+        document.getElementById("end-date").setAttribute("min", startDateValue);
+      }
+
+      
+      document
+        .getElementById("start-date")
+        .addEventListener("change", setMinEndDate);
+
+      setMinDateToday();
+    </script>
+    <script>
+      $(document).ready(function () {
+        function showToastWithAnimation() {
+          var toast = $(".toast");
+          toast.fadeIn();
+
+          setTimeout(function () {
+            toast.fadeOut();
+          }, 3000);
+        }
+
+        showToastWithAnimation();
+      });
+
+      $(document).ready(function () {
+        $(".rent-btn").click(function () {
+          var vehicleID = $(this).data("vehicle-id");
+
+          $("#vozilo").val(vehicleID);
+          $("#selected-user-id").val(userID);
+
+          console.log(vehicleID);
+        });
+      });
+    </script>
+  </body>
+</html>
